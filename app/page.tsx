@@ -431,7 +431,7 @@ export default function Page() {
         <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold">📦 在庫管理アプリ</h1>
+              <h1 className="text-3xl font-bold">📦 発注・仕込み 指示App</h1>
               <p className="mt-2 text-sm text-neutral-600">
                 カレー・米は5段階評価、それ以外は必要なものだけチェックして個数入力
               </p>
