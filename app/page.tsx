@@ -21,7 +21,6 @@ type NeedItem = {
   id: string;
   name: string;
   category: NeedCategory;
-  checked: boolean;
   quantity: number;
   unit: string;
   note?: string;
@@ -40,8 +39,8 @@ type HistoryItem = {
   }[];
 };
 
-const WORK_STORAGE_KEY = "vinvin_inventory_app_work_v3";
-const HISTORY_STORAGE_KEY = "vinvin_inventory_app_history_v3";
+const WORK_STORAGE_KEY = "vinvin_inventory_app_work_v4";
+const HISTORY_STORAGE_KEY = "vinvin_inventory_app_history_v4";
 const MAIL_TO = "chii.k.k.1207.1208.0701@gmail.com";
 
 const levelOptions: { value: CurryRiceLevel; label: string; emoji: string }[] = [
@@ -58,71 +57,70 @@ const importantInitial: ImportantItem[] = [
 ];
 
 const needItemsInitial: NeedItem[] = [
-  { id: "egg", name: "たまご", category: "topping", checked: false, quantity: 1, unit: "個" },
-  { id: "tomato", name: "トマト", category: "topping", checked: false, quantity: 1, unit: "個" },
-  { id: "green_pepper", name: "ピーマン", category: "topping", checked: false, quantity: 1, unit: "個" },
-  { id: "eggplant", name: "なす", category: "topping", checked: false, quantity: 1, unit: "本" },
-  { id: "lotus_root", name: "れんこん", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "shimeji", name: "しめじ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "eringi", name: "エリンギ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "maitake", name: "まいたけ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "butter", name: "バター", category: "topping", checked: false, quantity: 1, unit: "個" },
-  { id: "ebi_katsu", name: "海老カツ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "corn_croquette", name: "コーンクリームコロッケ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "tonkatsu", name: "とんかつ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "bacon", name: "ベーコン", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "fried_onion", name: "フライドオニオン", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "melting_cheese", name: "とろけるチーズ", category: "topping", checked: false, quantity: 1, unit: "袋" },
-  { id: "powder_cheese", name: "粉チーズ", category: "topping", checked: false, quantity: 1, unit: "本" },
-  { id: "raclette", name: "ラクレット", category: "topping", checked: false, quantity: 1, unit: "袋" },
+  { id: "egg", name: "たまご", category: "topping", quantity: 0, unit: "個" },
+  { id: "tomato", name: "トマト", category: "topping", quantity: 0, unit: "個" },
+  { id: "green_pepper", name: "ピーマン", category: "topping", quantity: 0, unit: "個" },
+  { id: "eggplant", name: "なす", category: "topping", quantity: 0, unit: "本" },
+  { id: "lotus_root", name: "れんこん", category: "topping", quantity: 0, unit: "袋" },
+  { id: "shimeji", name: "しめじ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "eringi", name: "エリンギ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "maitake", name: "まいたけ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "butter", name: "バター", category: "topping", quantity: 0, unit: "個" },
+  { id: "ebi_katsu", name: "海老カツ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "corn_croquette", name: "コーンクリームコロッケ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "tonkatsu", name: "とんかつ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "bacon", name: "ベーコン", category: "topping", quantity: 0, unit: "袋" },
+  { id: "fried_onion", name: "フライドオニオン", category: "topping", quantity: 0, unit: "袋" },
+  { id: "melting_cheese", name: "とろけるチーズ", category: "topping", quantity: 0, unit: "袋" },
+  { id: "powder_cheese", name: "粉チーズ", category: "topping", quantity: 0, unit: "本" },
+  { id: "raclette", name: "ラクレット", category: "topping", quantity: 0, unit: "袋" },
   {
     id: "ginger_pickles",
     name: "生姜のピクルス",
     category: "topping",
-    checked: false,
-    quantity: 1,
+    quantity: 0,
     unit: "回",
-    note: "そろそろ仕込みならチェック",
+    note: "そろそろ仕込みなら個数を入れる",
   },
-  { id: "harissa_topping", name: "ハリッサ", category: "topping", checked: false, quantity: 1, unit: "本" },
+  { id: "harissa_topping", name: "ハリッサ", category: "topping", quantity: 0, unit: "本" },
 
-  { id: "lettuce", name: "レタス", category: "salad", checked: false, quantity: 1, unit: "個" },
-  { id: "carrot", name: "にんじん", category: "salad", checked: false, quantity: 1, unit: "本" },
-  { id: "lemon", name: "レモン", category: "salad", checked: false, quantity: 1, unit: "個" },
-  { id: "salad_dressing", name: "ドレッシング", category: "salad", checked: false, quantity: 1, unit: "本" },
+  { id: "lettuce", name: "レタス", category: "salad", quantity: 0, unit: "個" },
+  { id: "carrot", name: "にんじん", category: "salad", quantity: 0, unit: "本" },
+  { id: "lemon", name: "レモン", category: "salad", quantity: 0, unit: "個" },
+  { id: "salad_dressing", name: "ドレッシング", category: "salad", quantity: 0, unit: "本" },
 
-  { id: "beer_keg", name: "ビールの樽", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "highball_keg", name: "ハイボールの樽", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "non_alcohol_beer", name: "ノンアルビール小瓶", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "red_wine", name: "赤ワイン", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "white_wine", name: "白ワイン", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "bottle_cola", name: "瓶コーラ", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "ginger_ale", name: "ジンジャエール", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "calpis", name: "カルピス", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "lemon_tea", name: "レモンティー", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "oolong_tea", name: "ウーロン茶", category: "drink", checked: false, quantity: 1, unit: "本" },
-  { id: "iced_coffee", name: "アイスコーヒー", category: "drink", checked: false, quantity: 1, unit: "本" },
+  { id: "beer_keg", name: "ビールの樽", category: "drink", quantity: 0, unit: "本" },
+  { id: "highball_keg", name: "ハイボールの樽", category: "drink", quantity: 0, unit: "本" },
+  { id: "non_alcohol_beer", name: "ノンアルビール小瓶", category: "drink", quantity: 0, unit: "本" },
+  { id: "red_wine", name: "赤ワイン", category: "drink", quantity: 0, unit: "本" },
+  { id: "white_wine", name: "白ワイン", category: "drink", quantity: 0, unit: "本" },
+  { id: "bottle_cola", name: "瓶コーラ", category: "drink", quantity: 0, unit: "本" },
+  { id: "ginger_ale", name: "ジンジャエール", category: "drink", quantity: 0, unit: "本" },
+  { id: "calpis", name: "カルピス", category: "drink", quantity: 0, unit: "本" },
+  { id: "lemon_tea", name: "レモンティー", category: "drink", quantity: 0, unit: "本" },
+  { id: "oolong_tea", name: "ウーロン茶", category: "drink", quantity: 0, unit: "本" },
+  { id: "iced_coffee", name: "アイスコーヒー", category: "drink", quantity: 0, unit: "本" },
 
-  { id: "salt", name: "しお", category: "seasoning", checked: false, quantity: 1, unit: "袋" },
-  { id: "black_pepper", name: "ブラックペッパー", category: "seasoning", checked: false, quantity: 1, unit: "本" },
-  { id: "soy_sauce", name: "しょうゆ", category: "seasoning", checked: false, quantity: 1, unit: "本" },
-  { id: "oil_can", name: "あぶら（一斗缶）", category: "seasoning", checked: false, quantity: 1, unit: "缶" },
-  { id: "oil_bottle", name: "あぶら（ボトル）", category: "seasoning", checked: false, quantity: 1, unit: "本" },
-  { id: "harissa_seasoning", name: "ハリッサ", category: "seasoning", checked: false, quantity: 1, unit: "本" },
-  { id: "apple_vinegar", name: "リンゴ酢", category: "seasoning", checked: false, quantity: 1, unit: "本" },
-  { id: "dressing_seasoning", name: "ドレッシング", category: "seasoning", checked: false, quantity: 1, unit: "本" },
+  { id: "salt", name: "しお", category: "seasoning", quantity: 0, unit: "袋" },
+  { id: "black_pepper", name: "ブラックペッパー", category: "seasoning", quantity: 0, unit: "本" },
+  { id: "soy_sauce", name: "しょうゆ", category: "seasoning", quantity: 0, unit: "本" },
+  { id: "oil_can", name: "あぶら（一斗缶）", category: "seasoning", quantity: 0, unit: "缶" },
+  { id: "oil_bottle", name: "あぶら（ボトル）", category: "seasoning", quantity: 0, unit: "本" },
+  { id: "harissa_seasoning", name: "ハリッサ", category: "seasoning", quantity: 0, unit: "本" },
+  { id: "apple_vinegar", name: "リンゴ酢", category: "seasoning", quantity: 0, unit: "本" },
+  { id: "dressing_seasoning", name: "ドレッシング", category: "seasoning", quantity: 0, unit: "本" },
 
-  { id: "bleach", name: "漂白剤", category: "supplies", checked: false, quantity: 1, unit: "本" },
-  { id: "dish_soap", name: "食器洗剤", category: "supplies", checked: false, quantity: 1, unit: "本" },
-  { id: "kitchen_paper", name: "キッチンペーパー", category: "supplies", checked: false, quantity: 1, unit: "袋" },
-  { id: "tissue", name: "ティッシュ", category: "supplies", checked: false, quantity: 1, unit: "箱" },
-  { id: "wet_towel", name: "おしぼり", category: "supplies", checked: false, quantity: 1, unit: "袋" },
-  { id: "spoon", name: "スプーン", category: "supplies", checked: false, quantity: 1, unit: "袋" },
-  { id: "takeout_box", name: "テイクアウト容器", category: "supplies", checked: false, quantity: 1, unit: "袋" },
-  { id: "duster", name: "ダスター", category: "supplies", checked: false, quantity: 1, unit: "枚" },
+  { id: "bleach", name: "漂白剤", category: "supplies", quantity: 0, unit: "本" },
+  { id: "dish_soap", name: "食器洗剤", category: "supplies", quantity: 0, unit: "本" },
+  { id: "kitchen_paper", name: "キッチンペーパー", category: "supplies", quantity: 0, unit: "袋" },
+  { id: "tissue", name: "ティッシュ", category: "supplies", quantity: 0, unit: "箱" },
+  { id: "wet_towel", name: "おしぼり", category: "supplies", quantity: 0, unit: "袋" },
+  { id: "spoon", name: "スプーン", category: "supplies", quantity: 0, unit: "袋" },
+  { id: "takeout_box", name: "テイクアウト容器", category: "supplies", quantity: 0, unit: "袋" },
+  { id: "duster", name: "ダスター", category: "supplies", quantity: 0, unit: "枚" },
 
-  { id: "snacks", name: "お菓子買って欲しい", category: "other", checked: false, quantity: 1, unit: "個" },
-  { id: "hot_drinks", name: "あったかい飲み物買って欲しい", category: "other", checked: false, quantity: 1, unit: "本" },
+  { id: "snacks", name: "お菓子買って欲しい", category: "other", quantity: 0, unit: "個" },
+  { id: "hot_drinks", name: "あったかい飲み物買って欲しい", category: "other", quantity: 0, unit: "本" },
 ];
 
 function getLevelMeta(level: CurryRiceLevel) {
@@ -192,6 +190,25 @@ function formatDateTime(date: Date) {
   }).format(date);
 }
 
+function mergeNeedItems(saved: NeedItem[], initial: NeedItem[]) {
+  const initialMap = new Map(initial.map((item) => [item.id, item]));
+  const savedMap = new Map(saved.map((item) => [item.id, item]));
+
+  const merged = initial.map((initialItem) => {
+    const savedItem = savedMap.get(initialItem.id);
+    return savedItem
+      ? {
+          ...initialItem,
+          ...savedItem,
+        }
+      : initialItem;
+  });
+
+  const customOnly = saved.filter((savedItem) => !initialMap.has(savedItem.id));
+
+  return [...customOnly, ...merged];
+}
+
 export default function Page() {
   const [importantItems, setImportantItems] = useState<ImportantItem[]>(importantInitial);
   const [needItems, setNeedItems] = useState<NeedItem[]>(needItemsInitial);
@@ -214,7 +231,9 @@ export default function Page() {
         };
 
         if (parsed.importantItems) setImportantItems(parsed.importantItems);
-        if (parsed.needItems) setNeedItems(parsed.needItems);
+        if (parsed.needItems) {
+          setNeedItems(mergeNeedItems(parsed.needItems, needItemsInitial));
+        }
         if (typeof parsed.mustSaveBeforeMail === "boolean") {
           setMustSaveBeforeMail(parsed.mustSaveBeforeMail);
         }
@@ -268,28 +287,13 @@ export default function Page() {
     markDirty();
   };
 
-  const toggleNeedItem = (id: string) => {
-    setNeedItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              checked: !item.checked,
-              quantity: item.quantity > 0 ? item.quantity : 1,
-            }
-          : item
-      )
-    );
-    markDirty();
-  };
-
   const updateQuantity = (id: string, quantity: number) => {
     setNeedItems((prev) =>
       prev.map((item) =>
         item.id === id
           ? {
               ...item,
-              quantity: Number.isNaN(quantity) ? 1 : Math.max(1, quantity),
+              quantity: Math.max(0, Number(quantity) || 0),
             }
           : item
       )
@@ -307,8 +311,7 @@ export default function Page() {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: trimmedName,
       category: newItemCategory,
-      checked: false,
-      quantity: 1,
+      quantity: 0,
       unit: trimmedUnit || "個",
     };
 
@@ -327,8 +330,8 @@ export default function Page() {
   };
 
   const saveHistory = () => {
-    const checked = needItems.filter((item) => item.checked);
-    if (checked.length === 0) {
+    const selectedItems = needItems.filter((item) => item.quantity > 0);
+    if (selectedItems.length === 0) {
       window.alert("保存する発注項目がまだないよ");
       return;
     }
@@ -337,7 +340,7 @@ export default function Page() {
       id: `${Date.now()}`,
       date: formatDateTime(new Date()),
       importantItems: importantItems.map((item) => ({ ...item })),
-      items: checked.map((item) => ({
+      items: selectedItems.map((item) => ({
         id: item.id,
         name: item.name,
         category: item.category,
@@ -364,11 +367,10 @@ export default function Page() {
       prev.map((item) => {
         const found = target.items.find((historyItem) => historyItem.id === item.id);
         if (!found) {
-          return { ...item, checked: false, quantity: 1 };
+          return { ...item, quantity: 0 };
         }
         return {
           ...item,
-          checked: true,
           quantity: found.quantity,
         };
       })
@@ -385,7 +387,7 @@ export default function Page() {
 
   const resetAllData = () => {
     const ok = window.confirm(
-      "今のチェック状態と追加項目をリセットする？\n※保存済みの履歴は残ります"
+      "今の入力中の内容をリセットする？\n※保存済みの履歴は残ります"
     );
     if (!ok) return;
 
@@ -408,9 +410,10 @@ export default function Page() {
     (item) => item.level === "half" || item.level === "oneDay" || item.level === "empty"
   );
 
-  const checkedItems = needItems.filter((item) => item.checked);
+  const selectedItems = needItems.filter((item) => item.quantity > 0);
+
   const prepCheckList = needItems.filter(
-    (item) => item.id === "ginger_pickles" && item.checked
+    (item) => item.id === "ginger_pickles" && item.quantity > 0
   );
 
   const groupedCategories: NeedCategory[] = [
@@ -422,10 +425,10 @@ export default function Page() {
     "other",
   ];
 
-  const groupedCheckedItems = groupedCategories
+  const groupedSelectedItems = groupedCategories
     .map((category) => ({
       category,
-      items: checkedItems.filter((item) => item.category === category),
+      items: selectedItems.filter((item) => item.category === category),
     }))
     .filter((group) => group.items.length > 0);
 
@@ -441,10 +444,10 @@ export default function Page() {
     });
     lines.push("");
 
-    if (checkedItems.length === 0) {
+    if (selectedItems.length === 0) {
       lines.push("現在、発注するものはありません。", "");
     } else {
-      groupedCheckedItems.forEach((group) => {
+      groupedSelectedItems.forEach((group) => {
         lines.push(`【${categoryLabel(group.category)}】`);
         group.items.forEach((item) => {
           lines.push(`・${item.name} ${item.quantity}${item.unit}`);
@@ -463,10 +466,35 @@ export default function Page() {
       return;
     }
 
-    const subject = encodeURIComponent("VinVinCURRY 買い物指示");
+    const subject = encodeURIComponent("VinVinCURRY 発注・仕込み指示");
     const body = encodeURIComponent(buildMailBody());
     window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${body}`;
   };
+
+  const ActionButtons = () => (
+    <div className="flex flex-wrap gap-3">
+      <button
+        type="button"
+        onClick={saveHistory}
+        className="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+      >
+        ① 履歴として保存
+      </button>
+
+      <button
+        type="button"
+        onClick={handleMailTo}
+        disabled={mustSaveBeforeMail}
+        className={`rounded-2xl px-5 py-3 text-sm font-semibold text-white transition ${
+          mustSaveBeforeMail
+            ? "cursor-not-allowed bg-neutral-300"
+            : "bg-neutral-900 hover:opacity-90"
+        }`}
+      >
+        ② メールする
+      </button>
+    </div>
+  );
 
   return (
     <main className="min-h-screen bg-neutral-50 p-6 text-neutral-900">
@@ -489,28 +517,11 @@ export default function Page() {
             </button>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={saveHistory}
-              className="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              ① 履歴として保存
-            </button>
+          <div className="mt-4">
+            <ActionButtons />
+          </div>
 
-            <button
-              type="button"
-              onClick={handleMailTo}
-              disabled={mustSaveBeforeMail}
-              className={`rounded-2xl px-5 py-3 text-sm font-semibold text-white transition ${
-                mustSaveBeforeMail
-                  ? "cursor-not-allowed bg-neutral-300"
-                  : "bg-neutral-900 hover:opacity-90"
-              }`}
-            >
-              ② メールする
-            </button>
-
+          <div className="mt-3 flex flex-wrap gap-3">
             <div className="rounded-2xl bg-neutral-100 px-4 py-3 text-sm text-neutral-600">
               {isLoaded ? "💾 自動保存中" : "⏳ 保存データを読み込み中"}
             </div>
@@ -531,8 +542,8 @@ export default function Page() {
 
             <div className="rounded-2xl bg-rose-50 p-4">
               <p className="text-sm text-neutral-600">発注候補</p>
-              <p className="mt-1 text-2xl font-bold">{checkedItems.length}件</p>
-              <p className="mt-1 text-xs text-neutral-500">必要なものだけ右に出る</p>
+              <p className="mt-1 text-2xl font-bold">{selectedItems.length}件</p>
+              <p className="mt-1 text-xs text-neutral-500">個数が1以上のものだけ対象</p>
             </div>
 
             <div className="rounded-2xl bg-emerald-50 p-4">
@@ -559,7 +570,7 @@ export default function Page() {
             <input
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
-              placeholder="項目名（例：紙ナプキン）"
+              placeholder="項目名（例：ファブリーズ）"
               className="w-full rounded-2xl border border-neutral-200 px-4 py-3 outline-none focus:border-neutral-400"
             />
 
@@ -668,119 +679,117 @@ export default function Page() {
                   <div className="mb-4">
                     <h2 className="text-xl font-bold">{categoryLabel(category)}</h2>
                     <p className="text-sm text-neutral-500">
-                      必要なものをタップして個数入力
+                      必要な個数を入れたものだけ発注対象
                     </p>
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                    {categoryItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`rounded-2xl border p-4 transition ${
-                          item.checked
-                            ? "border-neutral-900 bg-neutral-900 text-white"
-                            : "border-neutral-200 bg-white"
-                        }`}
-                      >
-                        <div className="grid gap-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleNeedItem(item.id)}
-                            className="text-left"
-                          >
-                            <p className="font-semibold">
-                              {item.checked ? "✅" : "⬜️"} {item.name}
-                            </p>
-                            <p
-                              className={`mt-1 text-sm ${
-                                item.checked ? "text-neutral-200" : "text-neutral-500"
-                              }`}
-                            >
-                              {item.note ?? (item.checked ? "発注リストに入ってる" : "必要ならタップ")}
-                            </p>
-                          </button>
+                    {categoryItems.map((item) => {
+                      const active = item.quantity > 0;
 
-                          <div className="grid grid-cols-[1fr_88px] gap-2 items-end">
-                            <label className="block">
-                              <span
-                                className={`mb-1 block text-xs ${
-                                  item.checked ? "text-neutral-200" : "text-neutral-500"
+                      return (
+                        <div
+                          key={item.id}
+                          className={`rounded-2xl border p-4 transition ${
+                            active
+                              ? "border-neutral-900 bg-neutral-900 text-white"
+                              : "border-neutral-200 bg-white"
+                          }`}
+                        >
+                          <div className="grid gap-3">
+                            <div className="text-left">
+                              <p className="font-semibold">{item.name}</p>
+                              <p
+                                className={`mt-1 text-sm ${
+                                  active ? "text-neutral-200" : "text-neutral-500"
                                 }`}
                               >
-                                必要な個数
-                              </span>
+                                {item.note ?? (active ? "発注リストに入ってる" : "必要なら個数を入れる")}
+                              </p>
+                            </div>
 
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  disabled={!item.checked}
-                                  onClick={() => {
-                                    const nextValue = Math.max(1, Number(item.quantity || 1) - 1);
-                                    updateQuantity(item.id, nextValue);
-                                  }}
-                                  className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
-                                    item.checked
-                                      ? "border border-white/20 bg-white text-neutral-900"
-                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
+                            <div className="grid grid-cols-[1fr_88px] gap-2 items-end">
+                              <label className="block">
+                                <span
+                                  className={`mb-1 block text-xs ${
+                                    active ? "text-neutral-200" : "text-neutral-500"
                                   }`}
                                 >
-                                  −
-                                </button>
+                                  必要な個数
+                                </span>
 
-                                <input
-                                  type="number"
-                                  min={1}
-                                  value={item.quantity}
-                                  disabled={!item.checked}
-                                  onFocus={(e) => e.target.select()}
-                                  onChange={(e) => {
-                                    const value = Number(e.target.value);
-                                    updateQuantity(item.id, Number.isNaN(value) ? 1 : Math.max(1, value));
-                                  }}
-                                  className={`w-16 text-center rounded-xl px-2 py-2 ${
-                                    item.checked
-                                      ? "border border-white/20 bg-white text-neutral-900"
-                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
-                                  }`}
-                                />
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                      active
+                                        ? "border border-white/20 bg-white text-neutral-900"
+                                        : "border border-neutral-200 bg-neutral-50 text-neutral-500"
+                                    }`}
+                                  >
+                                    −
+                                  </button>
 
-                                <button
-                                  type="button"
-                                  disabled={!item.checked}
-                                  onClick={() => {
-                                    const nextValue = Number(item.quantity || 1) + 1;
-                                    updateQuantity(item.id, nextValue);
-                                  }}
-                                  className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
-                                    item.checked
-                                      ? "border border-white/20 bg-white text-neutral-900"
-                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
-                                  }`}
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </label>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    value={item.quantity}
+                                    onFocus={(e) => e.target.select()}
+                                    onChange={(e) =>
+                                      updateQuantity(item.id, Number(e.target.value))
+                                    }
+                                    className={`w-16 text-center rounded-xl px-2 py-2 ${
+                                      active
+                                        ? "border border-white/20 bg-white text-neutral-900"
+                                        : "border border-neutral-200 bg-neutral-50 text-neutral-900"
+                                    }`}
+                                  />
 
-                            <button
-                              type="button"
-                              onClick={() => removeCustomItem(item.id)}
-                              className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
-                                item.checked
-                                  ? "border border-white/20 text-white hover:bg-white/10"
-                                  : "border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
-                              }`}
-                            >
-                              削除
-                            </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                      active
+                                        ? "border border-white/20 bg-white text-neutral-900"
+                                        : "border border-neutral-200 bg-neutral-50 text-neutral-500"
+                                    }`}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </label>
+
+                              <button
+                                type="button"
+                                onClick={() => removeCustomItem(item.id)}
+                                className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                                  active
+                                    ? "border border-white/20 text-white hover:bg-white/10"
+                                    : "border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                                }`}
+                              >
+                                削除
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </section>
               );
             })}
+
+            <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+              <div className="mb-3">
+                <h2 className="text-xl font-bold">最後の操作</h2>
+                <p className="text-sm text-neutral-500">
+                  下からでも同じ順番で進められるようにしてる
+                </p>
+              </div>
+              <ActionButtons />
+            </section>
           </section>
 
           <aside className="space-y-6">
@@ -821,10 +830,10 @@ export default function Page() {
               </div>
 
               <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                {checkedItems.length === 0 ? (
+                {selectedItems.length === 0 ? (
                   <p className="text-sm text-neutral-500">いまのところ候補なし</p>
                 ) : (
-                  groupedCheckedItems.map((group) => (
+                  groupedSelectedItems.map((group) => (
                     <div key={group.category} className="rounded-2xl bg-neutral-50 p-3 text-sm">
                       <p className="mb-2 font-bold">{categoryLabel(group.category)}</p>
                       <div className="space-y-1">
