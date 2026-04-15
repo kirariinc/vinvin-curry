@@ -754,7 +754,7 @@ export default function Page() {
                                   <button
                                     type="button"
                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                    className={`min-w-8 rounded-xl px-2 py-1 text-sm font-semibold ${
                                       active
                                         ? "border border-white/20 bg-white text-neutral-900"
                                         : "border border-neutral-200 bg-neutral-50 text-neutral-500"
@@ -779,7 +779,7 @@ export default function Page() {
                                   <button
                                     type="button"
                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                    className={`min-w-8 rounded-xl px-2 py-1 text-sm font-semibold ${
                                       active
                                         ? "border border-white/20 bg-white text-neutral-900"
                                         : "border border-neutral-200 bg-neutral-50 text-neutral-500"
