@@ -389,7 +389,42 @@ export default function Page() {
   const buildMailBody = () => {
     const lines: string[] = [];
     lines.push("買い物指示です。", "");
-
+  
+    lines.push("【カレー・米の残量】");
+  
+    importantItems.forEach((item) => {
+      const meta = getLevelMeta(item.level);
+      let extra = "";
+  
+      if (item.name === "米") {
+        if (item.level === "half") {
+          extra = "（そろそろ精米）";
+        }
+        if (item.level === "oneDay") {
+          extra = "（精米必要）";
+        }
+        if (item.level === "empty") {
+          extra = "（至急 精米！）";
+        }
+      }
+  
+      if (item.name === "カレー") {
+        if (item.level === "half") {
+          extra = "（仕込み準備）";
+        }
+        if (item.level === "oneDay") {
+          extra = "（仕込み必要）";
+        }
+        if (item.level === "empty") {
+          extra = "（至急 仕込み！）";
+        }
+      }
+  
+      lines.push(`・${item.name}：${meta.label}${extra ? ` ${extra}` : ""}`);
+    });
+  
+    lines.push("");
+  
     if (checkedItems.length === 0) {
       lines.push("現在、買うものはありません。", "");
     } else {
@@ -401,21 +436,8 @@ export default function Page() {
         lines.push("");
       });
     }
-
-    const importantWarnings = importantItems.filter(
-      (item) => item.level === "oneDay" || item.level === "empty"
-    );
-
-    if (importantWarnings.length > 0) {
-      lines.push("【重要チェック】");
-      importantWarnings.forEach((item) => {
-        const meta = getLevelMeta(item.level);
-        lines.push(`・${item.name}：${meta.label}`);
-      });
-      lines.push("");
-    }
-
-    lines.push("在庫管理アプリより");
+  
+    lines.push("発注・仕込み 指示Appより");
     return lines.join("\n");
   };
 
@@ -644,41 +666,39 @@ export default function Page() {
                             </p>
                           </button>
 
-                          <div className="grid grid-cols-[1fr_88px] gap-2 items-end">
-                            <label className="block">
-                              <span
-                                className={`mb-1 block text-xs ${
-                                  item.checked ? "text-neutral-200" : "text-neutral-500"
-                                }`}
-                              >
-                                必要な個数
-                              </span>
-                              <input
-                                type="number"
-                                min={1}
-                                value={item.quantity}
-                                disabled={!item.checked}
-                                onChange={(e) =>
-                                  updateQuantity(item.id, Number(e.target.value))
-                                }
-                                className={`w-full rounded-xl px-3 py-2 ${
-                                  item.checked
-                                    ? "border border-white/20 bg-white text-neutral-900"
-                                    : "border border-neutral-200 bg-neutral-50 text-neutral-400"
-                                }`}
-                              />
-                            </label>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              disabled={!item.checked}
+                              onClick={() =>
+                                updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                              }
+                              className="px-3 py-2 rounded-lg border"
+                            >
+                              −
+                            </button>
+
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.quantity}
+                              disabled={!item.checked}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                updateQuantity(item.id, Number(e.target.value))
+                              }
+                              className="w-16 text-center rounded-lg border"
+                            />
 
                             <button
                               type="button"
-                              onClick={() => removeCustomItem(item.id)}
-                              className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
-                                item.checked
-                                  ? "border border-white/20 text-white hover:bg-white/10"
-                                  : "border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
-                              }`}
+                              disabled={!item.checked}
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                              className="px-3 py-2 rounded-lg border"
                             >
-                              削除
+                              ＋
                             </button>
                           </div>
                         </div>
