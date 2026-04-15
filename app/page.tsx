@@ -40,8 +40,9 @@ type HistoryItem = {
   }[];
 };
 
-const STORAGE_KEY = "vinvin_inventory_app_rich_v2";
-const HISTORY_KEY = "vinvin_inventory_app_history_v2";
+const WORK_STORAGE_KEY = "vinvin_inventory_app_work_v3";
+const HISTORY_STORAGE_KEY = "vinvin_inventory_app_history_v3";
+const MAIL_TO = "chii.k.k.1207.1208.0701@gmail.com";
 
 const levelOptions: { value: CurryRiceLevel; label: string; emoji: string }[] = [
   { value: "full", label: "満タン", emoji: "🟢" },
@@ -129,13 +130,37 @@ function getLevelMeta(level: CurryRiceLevel) {
 }
 
 function getAttentionText(item: ImportantItem) {
-  if (item.level === "oneDay") {
-    return item.id === "rice" ? "⚠️ 明日までに精米チェック" : "⚠️ 明日分だけ";
+  if (item.id === "rice") {
+    if (item.level === "half") return "⚠️ そろそろ精米";
+    if (item.level === "oneDay") return "⚠️ 精米必要";
+    if (item.level === "empty") return "🚨 至急 精米！";
+    return "今のところOK";
   }
-  if (item.level === "empty") {
-    return item.id === "rice" ? "🚨 すぐ精米・補充したい" : "🚨 すぐ仕込み・補充したい";
+
+  if (item.id === "curry") {
+    if (item.level === "half") return "⚠️ 仕込み準備";
+    if (item.level === "oneDay") return "⚠️ 仕込み必要";
+    if (item.level === "empty") return "🚨 至急 仕込み！";
+    return "今のところOK";
   }
+
   return "今のところOK";
+}
+
+function getMailExtraText(item: ImportantItem) {
+  if (item.id === "rice") {
+    if (item.level === "half") return "（そろそろ精米）";
+    if (item.level === "oneDay") return "（精米必要）";
+    if (item.level === "empty") return "（至急 精米！）";
+  }
+
+  if (item.id === "curry") {
+    if (item.level === "half") return "（仕込み準備）";
+    if (item.level === "oneDay") return "（仕込み必要）";
+    if (item.level === "empty") return "（至急 仕込み！）";
+  }
+
+  return "";
 }
 
 function categoryLabel(category: NeedCategory) {
@@ -176,20 +201,26 @@ export default function Page() {
   const [newItemCategory, setNewItemCategory] = useState<NeedCategory>("other");
   const [newItemUnit, setNewItemUnit] = useState("個");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mustSaveBeforeMail, setMustSaveBeforeMail] = useState(true);
 
   useEffect(() => {
     try {
-      const savedWork = localStorage.getItem(STORAGE_KEY);
+      const savedWork = localStorage.getItem(WORK_STORAGE_KEY);
       if (savedWork) {
         const parsed = JSON.parse(savedWork) as {
           importantItems?: ImportantItem[];
           needItems?: NeedItem[];
+          mustSaveBeforeMail?: boolean;
         };
+
         if (parsed.importantItems) setImportantItems(parsed.importantItems);
         if (parsed.needItems) setNeedItems(parsed.needItems);
+        if (typeof parsed.mustSaveBeforeMail === "boolean") {
+          setMustSaveBeforeMail(parsed.mustSaveBeforeMail);
+        }
       }
 
-      const savedHistory = localStorage.getItem(HISTORY_KEY);
+      const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
       if (savedHistory) {
         const parsedHistory = JSON.parse(savedHistory) as HistoryItem[];
         setHistory(parsedHistory);
@@ -206,31 +237,35 @@ export default function Page() {
 
     try {
       localStorage.setItem(
-        STORAGE_KEY,
+        WORK_STORAGE_KEY,
         JSON.stringify({
           importantItems,
           needItems,
+          mustSaveBeforeMail,
         })
       );
     } catch (error) {
       console.error("作業データの保存に失敗しました", error);
     }
-  }, [importantItems, needItems, isLoaded]);
+  }, [importantItems, needItems, mustSaveBeforeMail, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded) return;
 
     try {
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
     } catch (error) {
       console.error("履歴の保存に失敗しました", error);
     }
   }, [history, isLoaded]);
 
+  const markDirty = () => setMustSaveBeforeMail(true);
+
   const updateImportantLevel = (id: ImportantItem["id"], level: CurryRiceLevel) => {
     setImportantItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, level } : item))
     );
+    markDirty();
   };
 
   const toggleNeedItem = (id: string) => {
@@ -245,6 +280,7 @@ export default function Page() {
           : item
       )
     );
+    markDirty();
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -258,6 +294,7 @@ export default function Page() {
           : item
       )
     );
+    markDirty();
   };
 
   const addNewItem = () => {
@@ -279,18 +316,20 @@ export default function Page() {
     setNewItemName("");
     setNewItemCategory("other");
     setNewItemUnit("個");
+    markDirty();
   };
 
   const removeCustomItem = (id: string) => {
     const ok = window.confirm("この項目を削除する？");
     if (!ok) return;
     setNeedItems((prev) => prev.filter((item) => item.id !== id));
+    markDirty();
   };
 
   const saveHistory = () => {
     const checked = needItems.filter((item) => item.checked);
     if (checked.length === 0) {
-      window.alert("保存する買い物項目がまだないよ");
+      window.alert("保存する発注項目がまだないよ");
       return;
     }
 
@@ -308,14 +347,15 @@ export default function Page() {
     };
 
     setHistory((prev) => [newHistory, ...prev]);
-    window.alert("履歴保存したよ 🙌");
+    setMustSaveBeforeMail(false);
+    window.alert("履歴保存したよ！次はメール送信してね 🙌");
   };
 
   const restoreHistory = (historyId: string) => {
     const target = history.find((item) => item.id === historyId);
     if (!target) return;
 
-    const ok = window.confirm("この履歴の内容を今の買い物リストに反映する？");
+    const ok = window.confirm("この履歴の内容を今の指示リストに反映する？");
     if (!ok) return;
 
     setImportantItems(target.importantItems);
@@ -333,6 +373,8 @@ export default function Page() {
         };
       })
     );
+
+    setMustSaveBeforeMail(true);
   };
 
   const deleteHistory = (historyId: string) => {
@@ -353,6 +395,7 @@ export default function Page() {
     setNewItemName("");
     setNewItemCategory("other");
     setNewItemUnit("個");
+    setMustSaveBeforeMail(true);
   };
 
   const filteredNeedItems = useMemo(() => {
@@ -362,7 +405,7 @@ export default function Page() {
   }, [needItems, search]);
 
   const lowImportantItems = importantItems.filter(
-    (item) => item.level === "oneDay" || item.level === "empty"
+    (item) => item.level === "half" || item.level === "oneDay" || item.level === "empty"
   );
 
   const checkedItems = needItems.filter((item) => item.checked);
@@ -388,45 +431,18 @@ export default function Page() {
 
   const buildMailBody = () => {
     const lines: string[] = [];
-    lines.push("買い物指示です。", "");
-  
+    lines.push("発注・仕込み指示です。", "");
+
     lines.push("【カレー・米の残量】");
-  
     importantItems.forEach((item) => {
       const meta = getLevelMeta(item.level);
-      let extra = "";
-  
-      if (item.name === "米") {
-        if (item.level === "half") {
-          extra = "（そろそろ精米）";
-        }
-        if (item.level === "oneDay") {
-          extra = "（精米必要）";
-        }
-        if (item.level === "empty") {
-          extra = "（至急 精米！）";
-        }
-      }
-  
-      if (item.name === "カレー") {
-        if (item.level === "half") {
-          extra = "（仕込み準備）";
-        }
-        if (item.level === "oneDay") {
-          extra = "（仕込み必要）";
-        }
-        if (item.level === "empty") {
-          extra = "（至急 仕込み！）";
-        }
-      }
-  
+      const extra = getMailExtraText(item);
       lines.push(`・${item.name}：${meta.label}${extra ? ` ${extra}` : ""}`);
     });
-  
     lines.push("");
-  
+
     if (checkedItems.length === 0) {
-      lines.push("現在、買うものはありません。", "");
+      lines.push("現在、発注するものはありません。", "");
     } else {
       groupedCheckedItems.forEach((group) => {
         lines.push(`【${categoryLabel(group.category)}】`);
@@ -436,15 +452,20 @@ export default function Page() {
         lines.push("");
       });
     }
-  
+
     lines.push("発注・仕込み 指示Appより");
     return lines.join("\n");
   };
 
   const handleMailTo = () => {
+    if (mustSaveBeforeMail) {
+      window.alert("先に『履歴として保存』してからメールしてね！");
+      return;
+    }
+
     const subject = encodeURIComponent("VinVinCURRY 買い物指示");
     const body = encodeURIComponent(buildMailBody());
-    window.location.href = `mailto:chii.k.k.1207.1208.0701@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -453,9 +474,9 @@ export default function Page() {
         <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold">📦 発注・仕込み 指示App</h1>
+              <h1 className="text-3xl font-bold">発注・仕込み 指示App</h1>
               <p className="mt-2 text-sm text-neutral-600">
-                カレー・米は5段階評価、それ以外は必要なものだけチェックして個数入力
+                ①履歴保存 → ②メール送信 の順で運用
               </p>
             </div>
 
@@ -471,32 +492,45 @@ export default function Page() {
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={handleMailTo}
-              className="rounded-2xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              📩 買い物指示をメールする
-            </button>
-            <button
-              type="button"
               onClick={saveHistory}
               className="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              🕘 履歴として保存
+              ① 履歴として保存
             </button>
+
+            <button
+              type="button"
+              onClick={handleMailTo}
+              disabled={mustSaveBeforeMail}
+              className={`rounded-2xl px-5 py-3 text-sm font-semibold text-white transition ${
+                mustSaveBeforeMail
+                  ? "cursor-not-allowed bg-neutral-300"
+                  : "bg-neutral-900 hover:opacity-90"
+              }`}
+            >
+              ② メールする
+            </button>
+
             <div className="rounded-2xl bg-neutral-100 px-4 py-3 text-sm text-neutral-600">
               {isLoaded ? "💾 自動保存中" : "⏳ 保存データを読み込み中"}
             </div>
+          </div>
+
+          <div className="mt-3 rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
+            {mustSaveBeforeMail
+              ? "変更あり：先に『履歴として保存』するとメール送信できるよ"
+              : "保存済み：このままメール送信OK"}
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl bg-amber-50 p-4">
               <p className="text-sm text-neutral-600">重要チェック</p>
               <p className="mt-1 text-2xl font-bold">{lowImportantItems.length}件</p>
-              <p className="mt-1 text-xs text-neutral-500">カレー・米の不足気味だけ表示</p>
+              <p className="mt-1 text-xs text-neutral-500">カレー・米の注意だけ表示</p>
             </div>
 
             <div className="rounded-2xl bg-rose-50 p-4">
-              <p className="text-sm text-neutral-600">買うもの</p>
+              <p className="text-sm text-neutral-600">発注候補</p>
               <p className="mt-1 text-2xl font-bold">{checkedItems.length}件</p>
               <p className="mt-1 text-xs text-neutral-500">必要なものだけ右に出る</p>
             </div>
@@ -508,9 +542,9 @@ export default function Page() {
             </div>
 
             <div className="rounded-2xl bg-sky-50 p-4">
-              <p className="text-sm text-neutral-600">入力の考え方</p>
-              <p className="mt-1 text-base font-bold">必要なものだけ触る</p>
-              <p className="mt-1 text-xs text-neutral-500">全部このルールで統一</p>
+              <p className="text-sm text-neutral-600">運用ルール</p>
+              <p className="mt-1 text-base font-bold">保存 → メール</p>
+              <p className="mt-1 text-xs text-neutral-500">順番固定でミス防止</p>
             </div>
           </div>
         </section>
@@ -518,7 +552,7 @@ export default function Page() {
         <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
           <div className="mb-4">
             <h2 className="text-xl font-bold">➕ 項目を追加</h2>
-            <p className="text-sm text-neutral-500">新しい買い物項目をその場で増やせる</p>
+            <p className="text-sm text-neutral-500">新しい発注項目をその場で増やせる</p>
           </div>
 
           <div className="grid gap-3 md:grid-cols-[1.4fr_180px_120px_120px]">
@@ -662,43 +696,82 @@ export default function Page() {
                                 item.checked ? "text-neutral-200" : "text-neutral-500"
                               }`}
                             >
-                              {item.note ?? (item.checked ? "買うリストに入ってる" : "必要ならタップ")}
+                              {item.note ?? (item.checked ? "発注リストに入ってる" : "必要ならタップ")}
                             </p>
                           </button>
 
-                          <div className="flex items-center gap-2">
+                          <div className="grid grid-cols-[1fr_88px] gap-2 items-end">
+                            <label className="block">
+                              <span
+                                className={`mb-1 block text-xs ${
+                                  item.checked ? "text-neutral-200" : "text-neutral-500"
+                                }`}
+                              >
+                                必要な個数
+                              </span>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  disabled={!item.checked}
+                                  onClick={() => {
+                                    const nextValue = Math.max(1, Number(item.quantity || 1) - 1);
+                                    updateQuantity(item.id, nextValue);
+                                  }}
+                                  className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                    item.checked
+                                      ? "border border-white/20 bg-white text-neutral-900"
+                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
+                                  }`}
+                                >
+                                  −
+                                </button>
+
+                                <input
+                                  type="number"
+                                  min={1}
+                                  value={item.quantity}
+                                  disabled={!item.checked}
+                                  onFocus={(e) => e.target.select()}
+                                  onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    updateQuantity(item.id, Number.isNaN(value) ? 1 : Math.max(1, value));
+                                  }}
+                                  className={`w-16 text-center rounded-xl px-2 py-2 ${
+                                    item.checked
+                                      ? "border border-white/20 bg-white text-neutral-900"
+                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
+                                  }`}
+                                />
+
+                                <button
+                                  type="button"
+                                  disabled={!item.checked}
+                                  onClick={() => {
+                                    const nextValue = Number(item.quantity || 1) + 1;
+                                    updateQuantity(item.id, nextValue);
+                                  }}
+                                  className={`min-w-10 rounded-xl px-3 py-2 text-sm font-semibold ${
+                                    item.checked
+                                      ? "border border-white/20 bg-white text-neutral-900"
+                                      : "border border-neutral-200 bg-neutral-50 text-neutral-400"
+                                  }`}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </label>
+
                             <button
                               type="button"
-                              disabled={!item.checked}
-                              onClick={() =>
-                                updateQuantity(item.id, Math.max(1, item.quantity - 1))
-                              }
-                              className="px-3 py-2 rounded-lg border"
+                              onClick={() => removeCustomItem(item.id)}
+                              className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                                item.checked
+                                  ? "border border-white/20 text-white hover:bg-white/10"
+                                  : "border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                              }`}
                             >
-                              −
-                            </button>
-
-                            <input
-                              type="number"
-                              min={1}
-                              value={item.quantity}
-                              disabled={!item.checked}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) =>
-                                updateQuantity(item.id, Number(e.target.value))
-                              }
-                              className="w-16 text-center rounded-lg border"
-                            />
-
-                            <button
-                              type="button"
-                              disabled={!item.checked}
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
-                              }
-                              className="px-3 py-2 rounded-lg border"
-                            >
-                              ＋
+                              削除
                             </button>
                           </div>
                         </div>
@@ -732,11 +805,16 @@ export default function Page() {
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold">🛒 買うもの一覧</h2>
+                <h2 className="text-lg font-bold">🛒 発注一覧</h2>
                 <button
                   type="button"
                   onClick={handleMailTo}
-                  className="rounded-xl bg-neutral-900 px-3 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                  disabled={mustSaveBeforeMail}
+                  className={`rounded-xl px-3 py-2 text-xs font-semibold text-white transition ${
+                    mustSaveBeforeMail
+                      ? "cursor-not-allowed bg-neutral-300"
+                      : "bg-neutral-900 hover:opacity-90"
+                  }`}
                 >
                   メールする
                 </button>
