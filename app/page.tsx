@@ -39,8 +39,18 @@ type HistoryItem = {
   }[];
 };
 
-const WORK_STORAGE_KEY = "vinvin_inventory_app_work_v4";
-const HISTORY_STORAGE_KEY = "vinvin_inventory_app_history_v4";
+const WORK_STORAGE_KEY = "vinvin_inventory_app_work";
+const HISTORY_STORAGE_KEY = "vinvin_inventory_app_history";
+// 旧バージョンも読む
+const LEGACY_WORK_STORAGE_KEYS = [
+  "vinvin_inventory_app_work_v4",
+  "vinvin_inventory_app_work_v3",
+];
+const LEGACY_HISTORY_STORAGE_KEYS = [
+  "vinvin_inventory_app_history_v4",
+  "vinvin_inventory_app_history_v3",
+];
+
 const MAIL_TO = "chii.k.k.1207.1208.0701@gmail.com";
 
 const levelOptions: { value: CurryRiceLevel; label: string; emoji: string }[] = [
@@ -222,14 +232,25 @@ export default function Page() {
 
   useEffect(() => {
     try {
-      const savedWork = localStorage.getItem(WORK_STORAGE_KEY);
-      if (savedWork) {
-        const parsed = JSON.parse(savedWork) as {
+      let savedWorkRaw = localStorage.getItem(WORK_STORAGE_KEY);
+  
+      if (!savedWorkRaw) {
+        for (const key of LEGACY_WORK_STORAGE_KEYS) {
+          const legacy = localStorage.getItem(key);
+          if (legacy) {
+            savedWorkRaw = legacy;
+            break;
+          }
+        }
+      }
+  
+      if (savedWorkRaw) {
+        const parsed = JSON.parse(savedWorkRaw) as {
           importantItems?: ImportantItem[];
           needItems?: NeedItem[];
           mustSaveBeforeMail?: boolean;
         };
-
+  
         if (parsed.importantItems) setImportantItems(parsed.importantItems);
         if (parsed.needItems) {
           setNeedItems(mergeNeedItems(parsed.needItems, needItemsInitial));
@@ -238,10 +259,21 @@ export default function Page() {
           setMustSaveBeforeMail(parsed.mustSaveBeforeMail);
         }
       }
-
-      const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory) as HistoryItem[];
+  
+      let savedHistoryRaw = localStorage.getItem(HISTORY_STORAGE_KEY);
+  
+      if (!savedHistoryRaw) {
+        for (const key of LEGACY_HISTORY_STORAGE_KEYS) {
+          const legacy = localStorage.getItem(key);
+          if (legacy) {
+            savedHistoryRaw = legacy;
+            break;
+          }
+        }
+      }
+  
+      if (savedHistoryRaw) {
+        const parsedHistory = JSON.parse(savedHistoryRaw) as HistoryItem[];
         setHistory(parsedHistory);
       }
     } catch (error) {
@@ -250,7 +282,7 @@ export default function Page() {
       setIsLoaded(true);
     }
   }, []);
-
+  
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -813,23 +845,34 @@ export default function Page() {
             </section>
 
             <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold">🛒 発注一覧</h2>
-                <button
-                  type="button"
-                  onClick={handleMailTo}
-                  disabled={mustSaveBeforeMail}
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold text-white transition ${
-                    mustSaveBeforeMail
-                      ? "cursor-not-allowed bg-neutral-300"
-                      : "bg-neutral-900 hover:opacity-90"
-                  }`}
-                >
-                  メールする
-                </button>
-              </div>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-bold">🛒 発注一覧</h2>
 
-              <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={saveHistory}
+                      className="rounded-xl bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+                    >
+                      履歴保存
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleMailTo}
+                      disabled={mustSaveBeforeMail}
+                      className={`rounded-xl px-3 py-2 text-xs font-semibold text-white transition ${
+                        mustSaveBeforeMail
+                          ? "cursor-not-allowed bg-neutral-300"
+                          : "bg-neutral-900 hover:opacity-90"
+                      }`}
+                    >
+                      メールする
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
                 {selectedItems.length === 0 ? (
                   <p className="text-sm text-neutral-500">いまのところ候補なし</p>
                 ) : (
