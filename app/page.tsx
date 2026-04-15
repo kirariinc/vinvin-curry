@@ -740,7 +740,7 @@ export default function Page() {
                               </p>
                             </div>
 
-                            <div className="grid grid-cols-[1fr_88px] gap-2 items-end">
+                            <div className="grid gap-2">
                               <label className="block">
                                 <span
                                   className={`mb-1 block text-xs ${
@@ -768,9 +768,7 @@ export default function Page() {
                                     min={0}
                                     value={item.quantity}
                                     onFocus={(e) => e.target.select()}
-                                    onChange={(e) =>
-                                      updateQuantity(item.id, Number(e.target.value))
-                                    }
+                                    onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
                                     className={`w-16 text-center rounded-xl px-2 py-2 ${
                                       active
                                         ? "border border-white/20 bg-white text-neutral-900"
@@ -795,7 +793,7 @@ export default function Page() {
                               <button
                                 type="button"
                                 onClick={() => removeCustomItem(item.id)}
-                                className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                                className={`w-full rounded-xl px-3 py-2 text-xs font-semibold transition ${
                                   active
                                     ? "border border-white/20 text-white hover:bg-white/10"
                                     : "border border-neutral-200 text-neutral-600 hover:bg-neutral-50"
@@ -804,6 +802,8 @@ export default function Page() {
                                 削除
                               </button>
                             </div>
+
+
                           </div>
                         </div>
                       );
